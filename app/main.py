@@ -1,11 +1,12 @@
 from fastapi import FastAPI, Request
+from fastapi.responses import JSONResponse
 
 app = FastAPI()
 
 
-@app.route("/hello")
-async def hello():
-    return {"hello": "world"}
+@app.route("/healthcheck", methods=["GET"])
+async def hello(request: Request):
+    return JSONResponse("Healthy")
 
 
 @app.api_route("/{path_name:path}", methods=["GET", "POST", "PATCH", "DELETE"])
