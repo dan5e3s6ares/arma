@@ -1,10 +1,11 @@
 {
-  "apis_to_mock": [{ "endpoint": "https://petstore.swagger.io/v2/swagger.json" }],
+  "mock_api": "https://api.apis.guru/v2/specs/adyen.com/CheckoutService/70/openapi.json",
   "functions_to_endpoints": [
     { "function": "get_by_tags", "endpoint": "/pet/findByTags" },
     { "function": "create", "endpoint": "/pet" },
     { "function": "update", "endpoint": "/pet/<int:id>" }
   ],
   "update_on_start": true,
-  "update_time_interval": 60
+  "update_time_interval": 86400,
+  "yaml_folder":"Install the PyYAML package or the uvicorn[standard] optional"
 }
