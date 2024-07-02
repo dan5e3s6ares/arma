@@ -3,6 +3,8 @@ import aiohttp
 from apscheduler.jobstores.memory import MemoryJobStore
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
+from functions.url_handle import UrlHandler
+
 jobstores = {"default": MemoryJobStore()}
 
 # Initialize an AsyncIOScheduler with the jobstore
@@ -29,6 +31,6 @@ class Jobs:
 
     @classmethod
     async def scheduled_job_2_update(cls):
-        print(cls.data["mock_api"])
         await download_file(cls.data["mock_api"])
         print("Job scheduled")
+        UrlHandler.sync()
