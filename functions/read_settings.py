@@ -2,6 +2,7 @@ import json
 import os
 
 from functions.syncronize import Jobs, scheduler
+from functions.url_handle import UrlHandler
 
 jobs = Jobs()
 
@@ -28,6 +29,8 @@ class ReadSettingsFile:
                 scheduler.start()
             if data["update_on_start"]:
                 await cls.update_on_startup()
+            else:
+                UrlHandler.sync()
 
         except FileNotFoundError:
             print("Settings file not found")
