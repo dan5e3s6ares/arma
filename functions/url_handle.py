@@ -4,6 +4,8 @@ from typing import List
 
 from fastapi import BackgroundTasks
 
+from functions.schemas_service import SchemaServices
+
 logger = logging.getLogger(__name__)
 
 
@@ -51,27 +53,47 @@ class BuildUrlDict:
         path_headers = {"required": [], "optional": []}
         for parameter in parameters:
             if "$ref" not in parameter.keys() and parameter["in"] == "query":
-                path_queries = cls._classify_parameters(parameter, path_queries)
-            elif "$ref" not in parameter.keys() and parameter["in"] == "header":
-                path_headers = cls._classify_parameters(parameter, path_headers)
+                path_queries = cls._classify_parameters(
+                    parameter, path_queries
+                )
+            elif (
+                "$ref" not in parameter.keys() and parameter["in"] == "header"
+            ):
+                path_headers = cls._classify_parameters(
+                    parameter, path_headers
+                )
             elif "$ref" in parameter.keys():
                 ref = parameter["$ref"].split("/")[2:]
                 actual = cls.components
                 for item in ref:
                     actual = actual[item]
                 if actual["in"] == "query":
-                    path_queries = cls._classify_parameters(actual, path_queries)
+                    path_queries = cls._classify_parameters(
+                        actual, path_queries
+                    )
                 elif actual["in"] == "header":
-                    path_headers = cls._classify_parameters(actual, path_headers)
+                    path_headers = cls._classify_parameters(
+                        actual, path_headers
+                    )
         cls.path_headers = path_headers
         return {"queries_param": path_queries, "headers_param": path_headers}
+
+    @classmethod
+    def build_path_params(cls, data: dict):
+        response = cls.build_query_params(data["parameters"])
+        try:
+            SchemaServices.load_components(cls.components)
+            response['payload'] = SchemaServices.build(data["requestBody"])
+        except KeyError:
+            pass
+        return response
 
     @classmethod
     def build_actions(cls, path: str, actions: dict):
         cls.path_queries[path] = {}
         for item in actions.items():
             key = item[0].upper()
-            cls.path_queries[path][key] = cls.build_query_params(item[1]["parameters"])
+            cls.path_queries[path][key] = cls.build_path_params(item[1])
 
     @classmethod
     def list_to_hierarchy_dict(cls, url_patterns: dict):
