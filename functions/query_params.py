@@ -4,7 +4,7 @@ class CheckParams:
     async def header_params(rules_dict: dict, params_dict: dict):
 
         missing_fields = {
-            item.lower() for item in rules_dict["optional"]
+            item.lower() for item in rules_dict["required"]
         }.issubset(set(params_dict.keys()))
 
         if not missing_fields:
