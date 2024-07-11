@@ -35,6 +35,7 @@ async def catch_all(request: Request, path_name: str):
     from_function = await UrlHandler.find_matching_url(path_name)
 
     try:
+        full_path = from_function
         from_function = from_function[request.method]
 
         all_keys_present = await CheckParams.query_params(
@@ -43,6 +44,14 @@ async def catch_all(request: Request, path_name: str):
         )
         if not all_keys_present:
             return JSONResponse("Bad request", status_code=400)
+
+        if "PARAMETERS" in full_path:
+            all_keys_present = await CheckParams.header_params(
+                rules_dict=full_path["PARAMETERS"]["headers_param"],
+                params_dict=request.query_params,
+            )
+            if not all_keys_present:
+                return JSONResponse("Bad request parameters", status_code=400)
 
         all_keys_present = await CheckParams.header_params(
             rules_dict=from_function["headers_param"],
@@ -68,7 +77,7 @@ async def catch_all(request: Request, path_name: str):
             ]
             return JSONResponse(errors, status_code=422)
 
-    except KeyError:
+    except KeyError as e:
         return JSONResponse("Method not allowed", status_code=405)
 
     return {
@@ -77,5 +86,5 @@ async def catch_all(request: Request, path_name: str):
         "query_params": request.query_params,
         "headers": request.headers,
         "body": await request.body(),
-        "from_function": from_function,
+        "from_function": full_path,
     }

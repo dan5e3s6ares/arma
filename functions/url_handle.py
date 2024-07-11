@@ -80,12 +80,15 @@ class BuildUrlDict:
 
     @classmethod
     def build_path_params(cls, data: dict):
-        response = cls.build_query_params(data["parameters"])
+        response = {"queries_param": [], "headers_param": []}
         try:
+            response = cls.build_query_params(data["parameters"])
             SchemaServices.load_components(cls.components)
             response['payload'] = SchemaServices.build(data["requestBody"])
         except KeyError:
             pass
+        except TypeError:
+            response = cls.build_query_params(data)
         return response
 
     @classmethod
