@@ -19,6 +19,7 @@ class CheckParams:
         This function checks if all keys, their types and required values from first_dict
         match the top level keys, their types and "required" values in second_dict.
         """
+
         missing_fields = set(rules_dict["required"]) - set(params_dict.keys())
 
         if len(missing_fields) > 0:

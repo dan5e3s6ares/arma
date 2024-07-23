@@ -1,5 +1,5 @@
 {
-  "mock_api": "https://api.apis.guru/v2/specs/amazonaws.com/amplifybackend/2020-08-11/openapi.json",
+  "mock_api": "https://api.apis.guru/v2/specs/zeno.fm/0.6-99cfdac/openapi.json",
   "functions_to_endpoints": [
     { "function": "get_by_tags", "endpoint": "/pet/findByTags" },
     { "function": "create", "endpoint": "/pet" },
