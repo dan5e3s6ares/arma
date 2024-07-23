@@ -3,6 +3,7 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
+from jsf import JSF
 from jsonschema import validate
 from jsonschema.exceptions import ValidationError
 
@@ -32,7 +33,12 @@ async def hello(request: Request):
 @app.api_route("/{path_name:path}", methods=["GET", "POST", "PATCH", "DELETE"])
 async def catch_all(request: Request, path_name: str):
 
-    from_function = await UrlHandler.find_matching_url(path_name)
+    try:
+        from_function = await UrlHandler.find_matching_url(path_name)
+    except KeyError:
+        return JSONResponse("Url not found", status_code=400)
+
+    print(from_function)
 
     try:
         full_path = from_function
@@ -60,11 +66,13 @@ async def catch_all(request: Request, path_name: str):
         if not all_keys_present:
             return JSONResponse("Bad request Headers", status_code=400)
 
+        payload = {}
+
         try:
             payload = await request.json()
             validate(
                 instance=payload,
-                schema=from_function["payload"]["request"]["schema"],
+                schema=from_function["payload"]["schema"],
             )
         except json.decoder.JSONDecodeError:
             pass
@@ -76,15 +84,32 @@ async def catch_all(request: Request, path_name: str):
                 }
             ]
             return JSONResponse(errors, status_code=422)
+        except KeyError:
+            return JSONResponse("Payload not allowed", status_code=405)
 
-    except KeyError as e:
+    except KeyError:
         return JSONResponse("Method not allowed", status_code=405)
 
-    return {
-        "request_method": request.method,
-        "path_name": path_name,
-        "query_params": request.query_params,
-        "headers": request.headers,
-        "body": await request.body(),
-        "from_function": full_path,
-    }
+    fake_json = {}
+
+    if payload != {}:
+        fake_json = payload
+
+    key = 200
+    for item in from_function['responses'].items():
+        faker = JSF(from_function['responses'][item[0]]['schema'])
+        fake_json = faker.generate(n=1, use_defaults=True, use_examples=True)
+        key = item[0]
+        break
+    return JSONResponse(fake_json, status_code=int(key))
+    # return fake_json
+
+    # return {
+    #     "fake_reponse": fake_json,
+    #     "request_method": request.method,
+    #     "path_name": path_name,
+    #     "query_params": request.query_params,
+    #     "headers": request.headers,
+    #     "body": await request.body(),
+    #     "from_function": full_path,
+    # }

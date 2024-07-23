@@ -35,7 +35,7 @@ class BuildUrlDict:
     def sync(cls):
         with open("files/openapi.json", "r", encoding="utf-8") as file:
             data = json.load(file)
-            cls.components = data["components"]
+            cls.components = data
             path_dict = data["paths"]
         cls.list_to_hierarchy_dict(path_dict)
         print("Paths Synced")
@@ -63,7 +63,7 @@ class BuildUrlDict:
                     parameter, path_headers
                 )
             elif "$ref" in parameter.keys():
-                ref = parameter["$ref"].split("/")[2:]
+                ref = parameter["$ref"].split("/")[1:]
                 actual = cls.components
                 for item in ref:
                     actual = actual[item]
@@ -80,10 +80,17 @@ class BuildUrlDict:
 
     @classmethod
     def build_path_params(cls, data: dict):
-        response = {"queries_param": [], "headers_param": []}
+        response = {
+            "queries_param": {"required": [], "optional": []},
+            "headers_param": {"required": [], "optional": []},
+        }
         try:
-            response = cls.build_query_params(data["parameters"])
+            if "parameters" in data:
+                response = cls.build_query_params(data["parameters"])
             SchemaServices.load_components(cls.components)
+            response['responses'] = {}
+            for item in data['responses'].items():
+                response['responses'][item[0]] = SchemaServices.build(item[1])
             response['payload'] = SchemaServices.build(data["requestBody"])
         except KeyError:
             pass

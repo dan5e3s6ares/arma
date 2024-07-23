@@ -22,5 +22,6 @@ apscheduler = "^3.10.4"
 aiohttp = "^3.9.5"
 aiofiles = "^24.1.0"
 jsonschema = "^4.22.0"
+jsf = "^0.11.2"
 
 [tool.poetry.dev-dependencies]
