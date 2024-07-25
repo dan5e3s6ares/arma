@@ -1,5 +1,6 @@
 {
-  "mock_api": "https://api.apis.guru/v2/specs/zeno.fm/0.6-99cfdac/openapi.json",
+  "mock_api_swaggerYamlUrl": "https://api.apis.guru/v2/specs/zeno.fm/0.6-99cfdac/openapi.yaml",
+  "mock_api_from_yaml_folder": true,
   "functions_to_endpoints": [
     { "function": "get_by_tags", "endpoint": "/pet/findByTags" },
     { "function": "create", "endpoint": "/pet" },

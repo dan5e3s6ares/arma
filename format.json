@@ -1,0 +1,57 @@
+{
+  "POST": {
+    "queries_param": { "required": [], "optional": [] },
+    "headers_param": { "required": [], "optional": [] },
+    "responses": {
+      "200": {
+        "content_type": "*/*",
+        "schema": {
+          "properties": {
+            "summaries": {
+              "items": {
+                "properties": {
+                  "error": { "type": "boolean" },
+                  "outgoingMessageParts": {
+                    "additionalProperties": { "type": "string" },
+                    "type": "object"
+                  },
+                  "resultParts": {
+                    "additionalProperties": { "type": "string" },
+                    "type": "object"
+                  },
+                  "title": { "type": "string" }
+                },
+                "type": "object"
+              },
+              "type": "array"
+            }
+          },
+          "type": "object"
+        }
+      },
+      "400": {
+        "content_type": "*/*",
+        "schema": {
+          "properties": { "message": { "type": "string" } },
+          "type": "object"
+        }
+      },
+      "403": { "content_type": "*/*", "description": "not allowed" },
+      "404": { "content_type": "*/*", "description": "not found" }
+    },
+    "payload": {
+      "content_type": "application/json",
+      "schema": {
+        "properties": {
+          "customJson": { "type": "string" },
+          "messageId": { "type": "string" },
+          "pushId": { "type": "string" },
+          "subtitle": { "type": "string" },
+          "summary": { "type": "string" },
+          "title": { "type": "string" }
+        },
+        "type": "object"
+      }
+    }
+  }
+}
