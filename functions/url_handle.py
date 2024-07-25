@@ -164,6 +164,4 @@ class UrlHandler:
                         path = path + "/" + key[0]
                         initial_path = initial_path[key[0]]
                         break
-        if path == {}:
-            return "NOT FOUND"
-        return BuildUrlDict.get_path_queries()["/" + path]
+        return BuildUrlDict.get_path_queries()["/" + path], path

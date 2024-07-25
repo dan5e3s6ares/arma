@@ -1,6 +1,7 @@
 import json
 import os
 
+from functions.endpoints_functions import FunctionsToEndpoints
 from functions.syncronize import Jobs, scheduler
 from functions.url_handle import UrlHandler
 
@@ -18,6 +19,7 @@ class ReadSettingsFile:
             print("Settings file found")
 
             jobs.set_data(data)
+            FunctionsToEndpoints.set_data(data)
             os.environ["TIME_TO_UPDATE"] = str(data["update_time_interval"])
             if data["update_time_interval"] > 0:
                 scheduler.add_job(
