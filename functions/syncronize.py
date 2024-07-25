@@ -37,6 +37,14 @@ def convert_datetime(obj):
         return obj
 
 
+async def convert_yaml_to_json():
+    with open('files/openapi.yaml') as fpi:
+        data = yaml.load(fpi, Loader)
+    json_data = json.dumps(data, default=convert_datetime, indent=4)
+    with open("files/openapi.json", 'w') as fpo:
+        fpo.write(json_data)
+
+
 class Jobs:
     data = {}
 
@@ -46,22 +54,20 @@ class Jobs:
 
     @classmethod
     async def scheduled_job_2_update(cls):
-        if "mock_api_swaggerUrl" in cls.data:
+
+        if cls.data.get("mock_api_swaggerUrl", False):
             await download_file(
                 cls.data["mock_api_swaggerUrl"], file_name="openapi.json"
             )
-        elif "mock_api_swaggerYamlUrl" in cls.data:
+
+        elif cls.data.get("mock_api_swaggerYamlUrl", False):
             await download_file(
                 cls.data["mock_api_swaggerYamlUrl"], file_name="openapi.yaml"
             )
+            await convert_yaml_to_json()
 
-        with open('files/openapi.yaml') as fpi:
-            data = yaml.load(fpi, Loader)
-        # Apply the conversion function recursively
-        json_data = json.dumps(data, default=convert_datetime, indent=4)
-
-        with open("files/openapi.json", 'w') as fpo:
-            fpo.write(json_data)
+        elif cls.data.get("mock_api_from_yaml_file", False):
+            await convert_yaml_to_json()
 
         print("Job scheduled")
         UrlHandler.sync()

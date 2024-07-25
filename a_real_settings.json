@@ -1,12 +1,11 @@
 {
   "mock_api_swaggerYamlUrl": "https://api.apis.guru/v2/specs/zeno.fm/0.6-99cfdac/openapi.yaml",
-  "mock_api_from_yaml_folder": true,
+  "mock_api_from_yaml_file": true,
   "functions_to_endpoints": [
     { "function": "get_by_tags", "endpoint": "/pet/findByTags" },
     { "function": "create", "endpoint": "/pet" },
     { "function": "update", "endpoint": "/pet/<int:id>" }
   ],
   "update_on_start": true,
-  "update_time_interval": 86400,
-  "yaml_folder": "Install the PyYAML package or the uvicorn[standard] optional"
+  "update_time_interval": 86400
 }

@@ -13,5 +13,5 @@ A real server to mock any api , really easy to use
   ],
   "update_on_start": true,
   "update_time_interval": 86400,
-  "yaml_folder": "Install the PyYAML package or the uvicorn[standard] optional"
+  "logging": "Install the PyYAML package or the uvicorn[standard] optional"
 }
