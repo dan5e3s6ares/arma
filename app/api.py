@@ -3,10 +3,10 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
-from jsf import JSF
 from jsonschema import validate
 from jsonschema.exceptions import ValidationError
 
+from functions.endpoints_functions import FunctionsToEndpoints
 from functions.query_params import CheckParams
 from functions.read_settings import ReadSettingsFile
 from functions.syncronize import scheduler
@@ -34,11 +34,9 @@ async def hello(request: Request):
 async def catch_all(request: Request, path_name: str):
 
     try:
-        from_function = await UrlHandler.find_matching_url(path_name)
+        from_function, path = await UrlHandler.find_matching_url(path_name)
     except KeyError:
         return JSONResponse("Url not found", status_code=400)
-
-    print(from_function)
 
     try:
         full_path = from_function
@@ -90,18 +88,22 @@ async def catch_all(request: Request, path_name: str):
     except KeyError:
         return JSONResponse("Method not allowed", status_code=405)
 
-    fake_json = {}
+    return await FunctionsToEndpoints.build_response(
+        path=path, request=request, from_function=from_function
+    )
 
-    if payload != {}:
-        fake_json = payload
+    # fake_json = {}
 
-    key = 200
-    for item in from_function['responses'].items():
-        faker = JSF(from_function['responses'][item[0]]['schema'])
-        fake_json = faker.generate(n=1, use_defaults=True, use_examples=True)
-        key = item[0]
-        break
-    return JSONResponse(fake_json, status_code=int(key))
+    # if payload != {}:
+    #     fake_json = payload
+
+    # key = 200
+    # for item in from_function['responses'].items():
+    #     faker = JSF(from_function['responses'][item[0]]['schema'])
+    #     fake_json = faker.generate(n=1, use_defaults=True, use_examples=True)
+    #     key = item[0]
+    #     break
+    # return JSONResponse(fake_json, status_code=int(key))
     # return fake_json
 
     # return {
