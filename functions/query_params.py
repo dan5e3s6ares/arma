@@ -1,34 +1,32 @@
+from urllib.parse import parse_qs
+
+from middleware.exceptions import ValidationErrorException
+
+
 class CheckParams:
 
     @staticmethod
-    async def header_params(rules_dict: dict, params_dict: dict):
-
-        missing_fields = {
-            item.lower() for item in rules_dict["required"]
-        }.issubset(set(params_dict.keys()))
-
-        if not missing_fields:
-            print(f"Missing fields: {missing_fields}")
-            return False
-
-        return True
+    async def transfrom_query_params(query_params):
+        return dict(
+            (k, v if len(v) > 1 else v[0])
+            for k, v in parse_qs(query_params, keep_blank_values=True).items()
+        )
 
     @staticmethod
-    async def query_params(rules_dict: dict, params_dict: dict):
+    async def headers_query_params(rules_dict: dict, params_dict: dict):
         """
-        This function checks if all keys, their types and required values from first_dict
-        match the top level keys, their types and "required" values in second_dict.
+        This function checks if all "required" keys from first_dict match
+        the keys in second_dict.
         """
 
-        missing_fields = set(rules_dict["required"]) - set(params_dict.keys())
+        params_dict_keys = params_dict.keys()
+        missing_fields = []
+
+        for index, item in enumerate(rules_dict["required"]):
+            if item.lower() not in params_dict_keys:
+                missing_fields.append(
+                    {"msg": "Missing Field", "loc": [index, item]}
+                )
 
         if len(missing_fields) > 0:
-            print(f"Missing fields: {missing_fields}")
-            return False
-
-        missing_fields = set(params_dict.keys()) - set(rules_dict["optional"])
-        if len(missing_fields) > 0:
-            print(f"Extra fields: {missing_fields}")
-            return False
-
-        return True
+            raise ValidationErrorException(missing_fields)

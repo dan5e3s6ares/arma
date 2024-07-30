@@ -2,6 +2,7 @@ import json
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, Request
+from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from jsonschema import validate
 from jsonschema.exceptions import ValidationError
@@ -11,6 +12,15 @@ from functions.query_params import CheckParams
 from functions.read_settings import ReadSettingsFile
 from functions.syncronize import scheduler
 from functions.url_handle import UrlHandler
+from middleware.exceptions import (
+    MethodNotAllowed,
+    NotFoundError,
+    ValidationErrorException,
+)
+from middleware.handler import (
+    ExceptionHandlerMiddleware,
+    validation_exception_handler,
+)
 
 
 @asynccontextmanager
@@ -23,6 +33,8 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(lifespan=lifespan)
+app.add_middleware(ExceptionHandlerMiddleware)
+app.add_exception_handler(RequestValidationError, validation_exception_handler)
 
 
 @app.route("/healthcheck", methods=["GET"])
@@ -33,36 +45,40 @@ async def hello(request: Request):
 @app.api_route("/{path_name:path}", methods=["GET", "POST", "PATCH", "DELETE"])
 async def catch_all(request: Request, path_name: str):
 
+    not_found = False
     try:
         from_function, path = await UrlHandler.find_matching_url(path_name)
     except KeyError:
-        return JSONResponse("Url not found", status_code=400)
+        not_found = True
+
+    if not_found:
+        raise NotFoundError(
+            [{"msg": "Url Not Found", "loc": ["path", path_name]}]
+        )
+
+    print(from_function)
 
     try:
         full_path = from_function
         from_function = from_function[request.method]
 
-        all_keys_present = await CheckParams.query_params(
+        await CheckParams.headers_query_params(
             rules_dict=from_function["queries_param"],
-            params_dict=request.query_params,
+            params_dict=await CheckParams.transfrom_query_params(
+                request.url.query
+            ),
         )
-        if not all_keys_present:
-            return JSONResponse("Bad request", status_code=400)
 
         if "PARAMETERS" in full_path:
-            all_keys_present = await CheckParams.header_params(
+            await CheckParams.headers_query_params(
                 rules_dict=full_path["PARAMETERS"]["headers_param"],
-                params_dict=request.query_params,
+                params_dict=request.headers,
             )
-            if not all_keys_present:
-                return JSONResponse("Bad request parameters", status_code=400)
-
-        all_keys_present = await CheckParams.header_params(
-            rules_dict=from_function["headers_param"],
-            params_dict=request.headers,
-        )
-        if not all_keys_present:
-            return JSONResponse("Bad request Headers", status_code=400)
+        else:
+            await CheckParams.headers_query_params(
+                rules_dict=from_function["headers_param"],
+                params_dict=request.headers,
+            )
 
         payload = {}
 
@@ -81,12 +97,16 @@ async def catch_all(request: Request, path_name: str):
                     "pointer": [e.json_path],
                 }
             ]
-            return JSONResponse(errors, status_code=422)
-        except KeyError:
-            return JSONResponse("Payload not allowed", status_code=405)
+            raise ValidationErrorException(errors) from e
+        except KeyError as e:
+            raise MethodNotAllowed(
+                [{"msg": "Payload not allowed", "loc": [request.method]}]
+            ) from e
 
-    except KeyError:
-        return JSONResponse("Method not allowed", status_code=405)
+    except KeyError as e:
+        raise MethodNotAllowed(
+            [{"msg": "Method not allowed", "loc": [request.method]}]
+        ) from e
 
     return await FunctionsToEndpoints.build_response(
         path=path, request=request, from_function=from_function

@@ -45,11 +45,21 @@ class BuildUrlDict:
         if parameter.get("required", False):
             parameters_queries["required"].append(parameter["name"])
         parameters_queries["optional"].append(parameter["name"])
+        parameters_queries["schema"]['properties'][parameter["name"]] = (
+            parameter.get("schema", None)
+        )
+        parameters_queries["schema"]["required"] = parameters_queries[
+            "required"
+        ]
         return parameters_queries
 
     @classmethod
     def build_query_params(cls, parameters: List):
-        path_queries = {"required": [], "optional": []}
+        path_queries = {
+            "required": [],
+            "optional": [],
+            "schema": {"properties": {}, "type": "object"},
+        }
         path_headers = {"required": [], "optional": []}
         for parameter in parameters:
             if "$ref" not in parameter.keys() and parameter["in"] == "query":
@@ -81,7 +91,11 @@ class BuildUrlDict:
     @classmethod
     def build_path_params(cls, data: dict):
         response = {
-            "queries_param": {"required": [], "optional": []},
+            "queries_param": {
+                "required": [],
+                "optional": [],
+                "schema": {"properties": {}, "type": "object"},
+            },
             "headers_param": {"required": [], "optional": []},
         }
         try:
