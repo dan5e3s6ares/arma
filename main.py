@@ -23,10 +23,11 @@ async def main():
     server = Server(
         config=uvicorn.Config(
             app_fastapi,
-            workers=1,
+            workers=3,
             loop="asyncio",
             use_colors=True,
-            reload=True,
+            host="0.0.0.0",
+            access_log=True,
         )
     )
 

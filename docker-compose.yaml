@@ -1,0 +1,16 @@
+services:
+  api:
+    build:
+      context: ./
+      dockerfile: ./Dockerfile
+      target: development
+    container_name: mock_api
+    environment:
+      - name=value
+    command: ["python", "main.py"]
+    restart: on-failure
+    ports:
+      - 8000:8000
+    volumes:
+      - ./:/app
+
