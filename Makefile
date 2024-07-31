@@ -3,3 +3,6 @@ run/tests:
 
 server/start:
 	uvicorn main:app --reload
+
+docker/start:
+	docker compose up --build -d
