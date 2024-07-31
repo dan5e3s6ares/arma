@@ -1,11 +1,9 @@
 import asyncio
 import logging
 
-
 import uvicorn
 
 from app.api import app as app_fastapi
-from functions.syncronize import scheduler
 
 
 class Server(uvicorn.Server):
@@ -24,7 +22,11 @@ async def main():
 
     server = Server(
         config=uvicorn.Config(
-            app_fastapi, workers=1, loop="asyncio", use_colors=True, reload=True
+            app_fastapi,
+            workers=1,
+            loop="asyncio",
+            use_colors=True,
+            reload=True,
         )
     )
 

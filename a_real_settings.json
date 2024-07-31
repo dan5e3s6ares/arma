@@ -1,6 +1,4 @@
 {
-  "mock_api_swaggerYamlUrl": "https://api.apis.guru/v2/specs/zeno.fm/0.6-99cfdac/openapi.yaml",
-  "mock_api_from_yaml_file": true,
   "functions_to_endpoints": {
     "/api/v2/podcasts/create": "TestClass",
     "/pet/<int:id>": "FunctionCreate"
