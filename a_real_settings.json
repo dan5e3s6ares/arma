@@ -1,8 +1,6 @@
 {
+  "mock_api_swaggerUrl": "https://yourapi.com/swagger.json",
   "functions_to_endpoints": {
-    "/api/v2/podcasts/create": "TestClass",
-    "/pet/<int:id>": "FunctionCreate"
-  },
-  "update_on_start": true,
-  "update_time_interval": 86400
+    "/api/v2/podcasts/create": "TestClass"
+  }
 }
