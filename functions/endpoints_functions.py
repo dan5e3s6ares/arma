@@ -21,7 +21,9 @@ class FunctionsToEndpoints:
                 "functions_to_endpoints.main."
                 + cls.data["functions_to_endpoints"]["/" + path]
             )
-            return my_class.response(request=request, url_data=from_function)
+            return await my_class.response(
+                request=request, url_data=from_function
+            )
         except KeyError:
             payload = await request.body()
             fake_json = {}

@@ -20,7 +20,9 @@ class ReadSettingsFile:
 
             jobs.set_data(data)
             FunctionsToEndpoints.set_data(data)
-            os.environ["TIME_TO_UPDATE"] = str(data["update_time_interval"])
+            os.environ["TIME_TO_UPDATE"] = str(
+                data.get("update_time_interval", 0)
+            )
             if data["update_time_interval"] > 0:
                 scheduler.add_job(
                     jobs.scheduled_job_2_update,
@@ -29,6 +31,7 @@ class ReadSettingsFile:
                     id="update_time_interval",
                 )
                 scheduler.start()
+            data["update_on_start"] = data.get("update_on_start", False)
             if data["update_on_start"]:
                 await cls.update_on_startup()
             else:
