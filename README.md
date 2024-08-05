@@ -17,7 +17,7 @@ ARMA provides:
 
 ARMA is an open-source HTTP server run from the command-line. It provides mocking, request validation, and content negotiation. Use it standalone tool or in continuous integration.
 
-### Install Self-hosted ARMA
+### Start Self-hosted ARMA
 
 ARMA requires
 
@@ -42,7 +42,7 @@ Add one of the following keys to mock from URL:
 | mock_api_swaggerYamlUrl | string   | Mock an API from Yaml Swagger URL   |
 | update_on_start | boolean | True to update allways after restart the container |
 | update_time_interval | integer | Feature not ready
-** HINT - For the first run, you need to set ```"update_on_start": True```
+** HINT - For the first run, you need to set ```"update_on_start": true```
 
 Add one of the following keys to mock from file:
 
@@ -87,7 +87,7 @@ class CheckBodyVariableValue:
     async def response(cls, request: Request, url_data: dict):
         payload = await request.json()
 
-        if payload.payload_id == "123":
+        if payload["payload_id"] == "123":
             faker = JSF(url_data['responses']["200"]['schema'])
             fake_payload_response = faker.generate(
                 n=1, use_defaults=True, use_examples=True
