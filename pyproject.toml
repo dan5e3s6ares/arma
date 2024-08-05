@@ -7,8 +7,8 @@ line-length = 79
 skip-string-normalization = true
 
 [tool.poetry]
-name = "a-real-mock-api"
-version = "0.1.0"
+name = "app"
+version = "1.0.0"
 description = "A real server to mock any api , really easy to use"
 authors = ["Daniel Soares Martins <daniel@soaresmartins.com>"]
 
