@@ -1,5 +1,4 @@
 {
-  "mock_api_swaggerUrl": "https://yourapi.com/swagger.json",
   "functions_to_endpoints": {
     "/api/v2/podcasts/create": "TestClass"
   }
