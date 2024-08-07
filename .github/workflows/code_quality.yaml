@@ -10,5 +10,3 @@ on:
 jobs:
   code-quality:
     uses: dan5e3s6ares/git_actions_workflows/.github/workflows/code-quality.yaml@main
-    with:
-      platform: "docker-compose"
