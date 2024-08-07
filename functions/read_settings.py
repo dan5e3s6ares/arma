@@ -21,9 +21,9 @@ class ReadSettingsFile:
             jobs.set_data(data)
             FunctionsToEndpoints.set_data(data)
             os.environ["TIME_TO_UPDATE"] = str(
-                data.get("update_time_interval", 0)
+                data.get("update_time_interval", "86400")
             )
-            if data["update_time_interval"] > 0:
+            if int(os.environ["TIME_TO_UPDATE"]) > 0:
                 scheduler.add_job(
                     jobs.scheduled_job_2_update,
                     "interval",

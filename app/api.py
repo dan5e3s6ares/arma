@@ -56,8 +56,6 @@ async def catch_all(request: Request, path_name: str):
             [{"msg": "Url Not Found", "loc": ["path", path_name]}]
         )
 
-    print(from_function)
-
     try:
         full_path = from_function
         from_function = from_function[request.method]
@@ -111,27 +109,3 @@ async def catch_all(request: Request, path_name: str):
     return await FunctionsToEndpoints.build_response(
         path=path, request=request, from_function=from_function
     )
-
-    # fake_json = {}
-
-    # if payload != {}:
-    #     fake_json = payload
-
-    # key = 200
-    # for item in from_function['responses'].items():
-    #     faker = JSF(from_function['responses'][item[0]]['schema'])
-    #     fake_json = faker.generate(n=1, use_defaults=True, use_examples=True)
-    #     key = item[0]
-    #     break
-    # return JSONResponse(fake_json, status_code=int(key))
-    # return fake_json
-
-    # return {
-    #     "fake_reponse": fake_json,
-    #     "request_method": request.method,
-    #     "path_name": path_name,
-    #     "query_params": request.query_params,
-    #     "headers": request.headers,
-    #     "body": await request.body(),
-    #     "from_function": full_path,
-    # }
