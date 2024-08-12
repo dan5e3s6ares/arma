@@ -32,12 +32,14 @@ class BuildUrlDict:
         return cls.path_headers
 
     @classmethod
-    def sync(cls):
+    def read_file(cls):
         with open("files/openapi.json", "r", encoding="utf-8") as file:
-            data = json.load(file)
-            cls.components = data
-            path_dict = data["paths"]
-        cls.list_to_hierarchy_dict(path_dict)
+            return json.load(file)
+
+    @classmethod
+    def sync(cls):
+        cls.components = cls.read_file()
+        cls.list_to_hierarchy_dict(cls.components['paths'])
         print("Paths Synced")
 
     @classmethod

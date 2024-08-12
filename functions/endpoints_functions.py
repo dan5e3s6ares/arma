@@ -33,7 +33,7 @@ class FunctionsToEndpoints:
 
             key = 200
             for item in from_function['responses'].items():
-                faker = JSF(from_function['responses'][item[0]]['schema'])
+                faker = JSF(from_function['responses'][item[0]]["schema"])
                 fake_json = faker.generate(
                     n=1, use_defaults=True, use_examples=True
                 )
