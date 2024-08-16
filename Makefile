@@ -6,3 +6,6 @@ server/start:
 
 docker/start:
 	docker compose up --build -d
+
+coverage:
+	coverage run -m unittest && coverage report -m

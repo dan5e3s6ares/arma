@@ -25,11 +25,9 @@ from middleware.handler import (
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    print("@SERVIDOR INICIANDO@")
     await ReadSettingsFile.read()
     yield
     scheduler.shutdown()
-    print("#SERVIDOR TERMINANDO#")
 
 
 app = FastAPI(lifespan=lifespan)
@@ -45,16 +43,12 @@ async def hello(request: Request):
 @app.api_route("/{path_name:path}", methods=["GET", "POST", "PATCH", "DELETE"])
 async def catch_all(request: Request, path_name: str):
 
-    not_found = False
     try:
         from_function, path = await UrlHandler.find_matching_url(path_name)
-    except KeyError:
-        not_found = True
-
-    if not_found:
+    except KeyError as e:
         raise NotFoundError(
             [{"msg": "Url Not Found", "loc": ["path", path_name]}]
-        )
+        ) from e
 
     try:
         full_path = from_function
@@ -72,11 +66,11 @@ async def catch_all(request: Request, path_name: str):
                 rules_dict=full_path["PARAMETERS"]["headers_param"],
                 params_dict=request.headers,
             )
-        else:
-            await CheckParams.headers_query_params(
-                rules_dict=from_function["headers_param"],
-                params_dict=request.headers,
-            )
+
+        await CheckParams.headers_query_params(
+            rules_dict=from_function["headers_param"],
+            params_dict=request.headers,
+        )
 
         payload = {}
 

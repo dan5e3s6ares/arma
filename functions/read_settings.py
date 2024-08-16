@@ -11,13 +11,16 @@ jobs = Jobs()
 class ReadSettingsFile:
 
     @classmethod
+    async def read_file(cls):
+        f = open("./a_real_settings.json", "r", encoding="utf-8")
+        data = json.loads(cls.read_file())
+        f.close()
+        return data
+
+    @classmethod
     async def read(cls):
         try:
-            f = open("./a_real_settings.json", "r", encoding="utf-8")
-            data = json.loads(f.read())
-            f.close()
-            print("Settings file found")
-
+            data = await cls.read_file()
             jobs.set_data(data)
             FunctionsToEndpoints.set_data(data)
             os.environ["TIME_TO_UPDATE"] = str(
