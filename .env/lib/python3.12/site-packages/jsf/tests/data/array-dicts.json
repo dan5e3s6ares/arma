@@ -1,0 +1,35 @@
+{
+	"type": "object",
+	"properties": {
+		"Basket": {
+			"type": "array",
+			"items": { "$ref": "#/definitions/basket_of_items" },
+			"minItems": 2,
+			"maxItems": 2,
+			"uniqueItems": true
+		}
+	},
+	"definitions": {
+		"basket_of_items": {
+			"type": "object",
+			"properties": {
+				"Item Name": {
+					"type": "string",
+					"enum": ["A", "B", "C", "D", "E"]
+					},
+				"Amount": {
+					"type": "integer",
+					"minimum": 0,
+					"exclusiveMaximum": 5
+					}
+				},
+			"required": [
+					"Item Name",
+					"Amount"
+					]
+		}
+	},
+	"required": [
+		"Basket"
+	]
+}

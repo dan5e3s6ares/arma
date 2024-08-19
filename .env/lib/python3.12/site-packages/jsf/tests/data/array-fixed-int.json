@@ -1,0 +1,7 @@
+{
+    "type": "array",
+    "$fixed": 5,
+    "items": {
+        "enum": ["red", "amber", "green"]
+    }
+}

@@ -1,5 +1,0 @@
-{
-  "functions_to_endpoints": {
-    "/api/v2/podcasts/create": "TestClass"
-  }
-}
