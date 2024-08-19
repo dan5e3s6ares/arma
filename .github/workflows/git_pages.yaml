@@ -1,0 +1,12 @@
+name: documentation
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  publish-page:
+    uses: dan5e3s6ares/git_actions_workflows/.github/workflows/publish-page.yaml@main
