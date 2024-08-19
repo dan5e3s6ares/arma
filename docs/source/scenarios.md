@@ -79,7 +79,7 @@ If it's not "123", it generates fake data based on the schema in url_data['respo
 ::: {card} {bdg-primary}`url_data` {bdg-primary-line}`schema`
 ```json
 {
-
+{}
 }
 ```
 :::
