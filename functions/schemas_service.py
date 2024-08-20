@@ -50,9 +50,13 @@ class SchemaServices:
             key = next(iter(schema['content']))
             study_schema = schema['content'][key]["schema"]
             base_schema = cls.turn_schema({}, study_schema)
+            required = False
+            if "required" in schema:
+                required = schema['required']
             return {
                 "content_type": key,
                 "schema": base_schema,
+                "required": required,
             }
         if "$ref" in schema:
             base = cls.turn_schema({}, cls.find_schema(schema))

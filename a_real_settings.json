@@ -1,5 +1,4 @@
 {
-  "functions_to_endpoints": {
-    "/api/v2/podcasts/create": "TestClass"
-  }
+    "mock_api_swaggerUrl": "https://api.apis.guru/v2/specs/adyen.com/FundService/3/openapi.json",
+    "update_on_start": true
 }
