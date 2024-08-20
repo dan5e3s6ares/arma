@@ -45,6 +45,7 @@ async def catch_all(request: Request, path_name: str):
 
     try:
         from_function, path = await UrlHandler.find_matching_url(path_name)
+        print("@@@@@@@@@@ : ", from_function)
     except KeyError as e:
         raise NotFoundError(
             [{"msg": "Url Not Found", "loc": ["path", path_name]}]

@@ -13,7 +13,7 @@ class ReadSettingsFile:
     @classmethod
     async def read_file(cls):
         f = open("./a_real_settings.json", "r", encoding="utf-8")
-        data = json.loads(cls.read_file())
+        data = json.loads(f.read())
         f.close()
         return data
 
