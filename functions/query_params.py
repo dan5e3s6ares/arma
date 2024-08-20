@@ -13,7 +13,9 @@ class CheckParams:
         )
 
     @staticmethod
-    async def headers_query_params(rules_dict: dict, params_dict: dict):
+    async def headers_query_params(
+        rules_dict: dict, params_dict: dict, position: str
+    ):
         """
         This function checks if all "required" keys from first_dict match
         the keys in second_dict.
@@ -22,10 +24,10 @@ class CheckParams:
         params_dict_keys = params_dict.keys()
         missing_fields = []
 
-        for index, item in enumerate(rules_dict["required"]):
+        for _, item in enumerate(rules_dict["required"]):
             if item.lower() not in params_dict_keys:
                 missing_fields.append(
-                    {"msg": "Missing Field", "loc": [index, item]}
+                    {"msg": "Missing Field", "loc": [position, item]}
                 )
 
         if len(missing_fields) > 0:

@@ -33,8 +33,10 @@ class BuildUrlDict:
 
     @classmethod
     def read_file(cls):
+        data = None
         with open("files/openapi.json", "r", encoding="utf-8") as file:
-            return json.load(file)
+            data = json.load(file)
+        return data
 
     @classmethod
     def sync(cls):
@@ -62,7 +64,11 @@ class BuildUrlDict:
             "optional": [],
             "schema": {"properties": {}, "type": "object"},
         }
-        path_headers = {"required": [], "optional": []}
+        path_headers = {
+            "required": [],
+            "optional": [],
+            "schema": {"properties": {}, "type": "object"},
+        }
         for parameter in parameters:
             if "$ref" not in parameter.keys() and parameter["in"] == "query":
                 path_queries = cls._classify_parameters(

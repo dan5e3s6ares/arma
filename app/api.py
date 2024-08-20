@@ -45,7 +45,6 @@ async def catch_all(request: Request, path_name: str):
 
     try:
         from_function, path = await UrlHandler.find_matching_url(path_name)
-        print("@@@@@@@@@@ : ", from_function)
     except KeyError as e:
         raise NotFoundError(
             [{"msg": "Url Not Found", "loc": ["path", path_name]}]
@@ -60,29 +59,40 @@ async def catch_all(request: Request, path_name: str):
             params_dict=await CheckParams.transfrom_query_params(
                 request.url.query
             ),
+            position="query",
         )
 
         if "PARAMETERS" in full_path:
             await CheckParams.headers_query_params(
                 rules_dict=full_path["PARAMETERS"]["headers_param"],
                 params_dict=request.headers,
+                position="headers",
             )
 
         await CheckParams.headers_query_params(
             rules_dict=from_function["headers_param"],
             params_dict=request.headers,
+            position="headers",
         )
-
-        payload = {}
 
         try:
             payload = await request.json()
-            validate(
-                instance=payload,
-                schema=from_function["payload"]["schema"],
-            )
         except json.decoder.JSONDecodeError:
-            pass
+            payload = {}
+
+        try:
+            required = False
+            if from_function.get("payload", None):
+                required = from_function["payload"].get("required", None)
+                validate(
+                    instance=payload,
+                    schema=from_function["payload"]["schema"],
+                )
+
+            if required and payload == {}:
+                raise MethodNotAllowed(
+                    [{"msg": "Payload required", "loc": [request.method]}]
+                )
         except ValidationError as e:
             errors = [
                 {
