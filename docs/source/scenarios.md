@@ -8,7 +8,6 @@ With ARMA you can create scenarios by adding your own uses cases to OpenAPI path
 
 ```json
 {
-  "update_on_start": true,
   "mock_api_from_json_file": true,
   "functions_to_endpoints": {
     "/api/v1/test/create": "ScenarioCheckBodyVariableValue",
@@ -79,7 +78,52 @@ If it's not "123", it generates fake data based on the schema in url_data['respo
 ::: {card} {bdg-primary}`url_data` {bdg-primary-line}`schema`
 ```json
 {
-{}
+    "queries_param": {
+        "required": [
+            "list<string>"
+        ],
+        "optional": [
+            "list<string>"
+        ],
+        "schema": "<object>"
+    },
+    "headers_param": {
+        "required": [
+            "list<string>"
+        ],
+        "optional": [
+            "list<string>"
+        ],
+        "schema": "<object>"
+    },
+    "responses": {
+        "200": {
+            "content_type": "*/*",
+            "schema": {
+                "properties": "<object>",
+                "required": [
+                    "list<string>"
+                ],
+                "type": "string|object...",
+                "examples": [
+                    "list<object>"
+                ]
+            }
+        }
+    },
+    "payload": {
+        "content_type": "*/*",
+        "schema": {
+            "properties": "<object>",
+            "required": [
+                "list<string>"
+            ],
+            "type": "string|object...",
+            "examples": [
+                "list<object>"
+            ]
+        }
+    }
 }
 ```
 :::
