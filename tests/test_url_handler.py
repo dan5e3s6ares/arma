@@ -23,4 +23,3 @@ class TestUrlHandle(unittest.TestCase):
             list(action.get_path_queries().keys())[0],
             list(open_api_mock()['paths'].keys())[0],
         )
-        print(action.get_path_headers())
