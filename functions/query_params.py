@@ -1,6 +1,11 @@
+import logging
 from urllib.parse import parse_qs
 
+from jsonschema import ValidationError, validate
+
 from middleware.exceptions import ValidationErrorException
+
+logger = logging.getLogger(__name__)
 
 
 class CheckParams:
@@ -15,20 +20,29 @@ class CheckParams:
     @staticmethod
     async def headers_query_params(
         rules_dict: dict, params_dict: dict, position: str
-    ):
+    ) -> None:
         """
         This function checks if all "required" keys from first_dict match
         the keys in second_dict.
         """
-
-        params_dict_keys = params_dict.keys()
-        missing_fields = []
-
-        for _, item in enumerate(rules_dict["required"]):
-            if item.lower() not in params_dict_keys:
-                missing_fields.append(
-                    {"msg": "Missing Field", "loc": [position, item]}
+        try:
+            if position == "path-params" and "" in params_dict.values():
+                raise ValidationError(
+                    "Path parameters cannot be empty",
+                    instance=params_dict,
+                    schema=rules_dict,
                 )
-
-        if len(missing_fields) > 0:
-            raise ValidationErrorException(missing_fields)
+            validate(
+                instance=params_dict,
+                schema=rules_dict,
+            )
+        except ValidationError as e:
+            pointer = [position]
+            pointer.extend(e.json_path.split("."))
+            errors = [
+                {
+                    "detail": e.message,
+                    "pointer": pointer,
+                }
+            ]
+            raise ValidationErrorException(errors) from e

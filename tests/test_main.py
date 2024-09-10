@@ -71,7 +71,8 @@ class TestApp(unittest.TestCase):
 
     @patch("app.api.UrlHandler.find_matching_url")
     def test_payload_validation_and_response(self, mock):
-        mock.return_value = form_mock()
+        a, b = form_mock()
+        mock.return_value = a, b, ""
 
         response = self.client.post(
             "/url/test-path?param1=value1&param2=value2",
@@ -88,7 +89,7 @@ class TestApp(unittest.TestCase):
 
         response["GET"] = response.pop("POST")
 
-        mock.return_value = response, path
+        mock.return_value = response, path, ""
 
         response = self.client.post(
             "/url/test-path?param1=value1&param2=value2",
@@ -112,7 +113,7 @@ class TestApp(unittest.TestCase):
     def test_headers(self, mock):
         response, path = form_mock()
 
-        mock.return_value = response, path
+        mock.return_value = response, path, ""
 
         response = self.client.post(
             "/url/test-path?param1=value1&param2=value2",
@@ -127,14 +128,17 @@ class TestApp(unittest.TestCase):
                 'type': 'ValidationError',
                 'title': 'Invalid Request',
                 'errors': [
-                    {'detail': 'Missing Field', 'pointer': [0, 'header1']}
+                    {
+                        'detail': "'header1' is a required property",
+                        'pointer': ['headers', '$'],
+                    }
                 ],
             },
         )
 
         response, path = form_mock()
         response.pop("PARAMETERS")
-        mock.return_value = response, path
+        mock.return_value = response, path, ""
 
         response = self.client.post(
             "/url/test-path?param1=value1&param2=value2",
@@ -149,7 +153,10 @@ class TestApp(unittest.TestCase):
                 'type': 'ValidationError',
                 'title': 'Invalid Request',
                 'errors': [
-                    {'detail': 'Missing Field', 'pointer': [0, 'header1']}
+                    {
+                        'detail': "'header1' is a required property",
+                        'pointer': ['headers', '$'],
+                    }
                 ],
             },
         )
