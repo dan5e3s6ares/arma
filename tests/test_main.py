@@ -127,7 +127,10 @@ class TestApp(unittest.TestCase):
                 'type': 'ValidationError',
                 'title': 'Invalid Request',
                 'errors': [
-                    {'detail': 'Missing Field', 'pointer': [0, 'header1']}
+                    {
+                        'detail': 'Missing Field',
+                        'pointer': ["headers", 'header1'],
+                    }
                 ],
             },
         )
@@ -149,7 +152,10 @@ class TestApp(unittest.TestCase):
                 'type': 'ValidationError',
                 'title': 'Invalid Request',
                 'errors': [
-                    {'detail': 'Missing Field', 'pointer': [0, 'header1']}
+                    {
+                        'detail': 'Missing Field',
+                        'pointer': ["headers", 'header1'],
+                    }
                 ],
             },
         )

@@ -57,4 +57,5 @@ class TestSchemas(unittest.TestCase):
                 'required': ['categories', 'description'],
                 'type': 'object',
             },
+            'required': False,
         }
