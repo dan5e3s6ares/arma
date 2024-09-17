@@ -1,4 +1,4 @@
 {
-    "mock_api_swaggerUrl": "https://api.apis.guru/v2/specs/adyen.com/FundService/3/openapi.json",
+    "mock_api_from_json_file": true,
     "update_on_start": true
 }

@@ -20,5 +20,7 @@ class TestSchemas(unittest.IsolatedAsyncioTestCase):
         mock_read_file.return_value = open_api_mock()
         mock_open_api.return_value = settings_mock()
         await ReadSettingsFile.read()
-        _, path = await UrlHandler.find_matching_url("/api/v2/podcasts/create")
+        _, path, _ = await UrlHandler.find_matching_url(
+            "/api/v2/podcasts/create"
+        )
         self.assertEqual("/" + path, list(open_api_mock()["paths"].keys())[0])

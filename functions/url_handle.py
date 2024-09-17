@@ -45,16 +45,46 @@ class BuildUrlDict:
         print("Paths Synced")
 
     @classmethod
+    def check_if_regex(cls, schema: dict):
+        if schema:
+            if (
+                schema.get("type", None) == "integer"
+                and schema.get("format", None) == "int64"
+            ):
+                schema['type'] = "string"
+                schema['pattern'] = "^-?(0|[1-9]\\d{0,18})$"
+            elif (
+                schema.get("type", None) == "integer"
+                and schema.get("format", None) == "int32"
+            ):
+                schema['type'] = "string"
+                schema['pattern'] = "^-?(0|[1-9]\\d{0,9})$"
+            elif (
+                schema.get("type", None) == "number"
+                and schema.get("format", None) == "float"
+            ):
+                schema['type'] = "string"
+                schema['pattern'] = "^-?(0|[1-9]\\d{0,9})(\\.\\d{1,6})?$"
+            elif schema.get("format", None) == "uuid":
+                schema['pattern'] = (
+                    "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"
+                )
+            elif schema.get("type", None) == "boolean":
+                schema['type'] = "string"
+                schema['pattern'] = "^(true|false)$"
+        return schema
+
+    @classmethod
     def _classify_parameters(cls, parameter: dict, parameters_queries: dict):
         if parameter.get("required", False):
             parameters_queries["required"].append(parameter["name"])
-        parameters_queries["optional"].append(parameter["name"])
-        parameters_queries["schema"]['properties'][parameter["name"]] = (
-            parameter.get("schema", None)
+        parameters_queries["additionalProperties"] = parameter.get(
+            "additionalProperties", False
         )
-        parameters_queries["schema"]["required"] = parameters_queries[
-            "required"
-        ]
+        parameters_queries["optional"].append(parameter["name"])
+        parameters_queries['properties'][parameter["name"]] = (
+            cls.check_if_regex(parameter.get("schema", None))
+        )
         return parameters_queries
 
     @classmethod
@@ -62,12 +92,20 @@ class BuildUrlDict:
         path_queries = {
             "required": [],
             "optional": [],
-            "schema": {"properties": {}, "type": "object"},
+            "properties": {},
+            "type": "object",
         }
         path_headers = {
             "required": [],
             "optional": [],
-            "schema": {"properties": {}, "type": "object"},
+            "properties": {},
+            "type": "object",
+        }
+        path_params = {
+            "required": [],
+            "optional": [],
+            "properties": {},
+            "type": "object",
         }
         for parameter in parameters:
             if "$ref" not in parameter.keys() and parameter["in"] == "query":
@@ -80,6 +118,8 @@ class BuildUrlDict:
                 path_headers = cls._classify_parameters(
                     parameter, path_headers
                 )
+            elif "$ref" not in parameter.keys() and parameter["in"] == "path":
+                path_params = cls._classify_parameters(parameter, path_params)
             elif "$ref" in parameter.keys():
                 ref = parameter["$ref"].split("/")[1:]
                 actual = cls.components
@@ -93,8 +133,15 @@ class BuildUrlDict:
                     path_headers = cls._classify_parameters(
                         actual, path_headers
                     )
+                elif actual["in"] == "path":
+                    path_params = cls._classify_parameters(actual, path_params)
         cls.path_headers = path_headers
-        return {"queries_param": path_queries, "headers_param": path_headers}
+        cls.path_headers["additionalProperties"] = True
+        return {
+            "queries_param": path_queries,
+            "headers_param": path_headers,
+            "path_params": path_params,
+        }
 
     @classmethod
     def build_path_params(cls, data: dict):
@@ -102,9 +149,22 @@ class BuildUrlDict:
             "queries_param": {
                 "required": [],
                 "optional": [],
-                "schema": {"properties": {}, "type": "object"},
+                "properties": {},
+                "type": "object",
             },
-            "headers_param": {"required": [], "optional": []},
+            "headers_param": {
+                "required": [],
+                "optional": [],
+                "properties": {},
+                "type": "object",
+                "additionalProperties": True,
+            },
+            "path_params": {
+                "required": [],
+                "optional": [],
+                "properties": {},
+                "type": "object",
+            },
         }
         try:
             if "parameters" in data:
@@ -169,7 +229,7 @@ class UrlHandler:
 
         path = ""
         initial_path = BuildUrlDict.get_path_dict()
-        keys_values = []
+        keys_values = {}
 
         for item in url_parts:
             try:
@@ -182,8 +242,8 @@ class UrlHandler:
             except KeyError:
                 for key in initial_path.items():
                     if "{" in key[0]:
-                        keys_values.append(item)
+                        keys_values[key[0][1:-1]] = item
                         path = path + "/" + key[0]
                         initial_path = initial_path[key[0]]
                         break
-        return BuildUrlDict.get_path_queries()["/" + path], path
+        return BuildUrlDict.get_path_queries()["/" + path], path, keys_values
